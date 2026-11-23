@@ -1,0 +1,110 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
+class ProductController extends Controller
+{
+    // GET - Menampilkan semua produk
+    public function index()
+    {
+        $products = Product::with('user:id,name')->get();
+
+        return response()->json([
+            'message' => 'Daftar produk berhasil ditampilkan',
+            'data' => $products
+        ], 200);
+    }
+
+    // GET - Menampilkan detail produk
+    public function show($id)
+    {
+        $product = Product::with('user:id,name')
+            ->findOrFail($id);
+
+        return response()->json([
+            'message' => 'Detail produk berhasil ditampilkan',
+            'data' => $product
+        ], 200);
+    }
+
+    // POST - Menambahkan produk
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nama_product' => 'required|string|max:100',
+            'kategori' => [
+                'required',
+                Rule::in(['Makanan', 'Minuman', 'Dessert'])
+            ],
+            'harga' => 'required|integer|min:0',
+            'deskripsi' => 'nullable|string',
+            'stok' => 'required|integer|min:0'
+        ]);
+
+        $validated['user_id'] = $request->user()->id;
+
+        $product = Product::create($validated);
+
+        return response()->json([
+            'message' => 'Produk berhasil ditambahkan',
+            'data' => $product
+        ], 201);
+    }
+
+    // PUT/PATCH - Mengubah produk
+    public function update(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+        $user = $request->user();
+
+        // User hanya bisa mengubah produk miliknya
+        if (
+            $user->role !== 'admin' &&
+            (int) $product->user_id !== (int) $user->id
+        ) {
+            return response()->json([
+                'message' => 'Anda tidak memiliki akses mengubah produk ini'
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'nama_product' => 'sometimes|required|string|max:100',
+            'kategori' => [
+                'sometimes',
+                'required',
+                Rule::in(['Makanan', 'Minuman', 'Dessert'])
+            ],
+            'harga' => 'sometimes|required|integer|min:0',
+            'deskripsi' => 'sometimes|nullable|string',
+            'stok' => 'sometimes|required|integer|min:0'
+        ]);
+
+        $product->update($validated);
+
+        return response()->json([
+            'message' => 'Produk berhasil diperbarui',
+            'data' => $product->fresh()
+        ], 200);
+    }
+
+    // DELETE - Hanya admin
+    public function destroy(Request $request, $id)
+    {
+        if ($request->user()->role !== 'admin') {
+            return response()->json([
+                'message' => 'Hanya admin yang dapat menghapus produk'
+            ], 403);
+        }
+
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return response()->json([
+            'message' => 'Produk berhasil dihapus'
+        ], 200);
+    }
+}

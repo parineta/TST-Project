@@ -2,31 +2,86 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
-// Terbuka
-Route::get('/ping', fn () => ['message' => 'API Laravel berjalan']);
+/*
+|--------------------------------------------------------------------------
+| PUBLIC ROUTES - Tanpa Login
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/ping', fn () => [
+    'message' => 'API Laravel berjalan'
+]);
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Harus login (user & admin): Create, Read, Update
+// Product - Public
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{id}', [ProductController::class, 'show'])
+    ->whereNumber('id');
+
+/*
+|--------------------------------------------------------------------------
+| AUTHENTICATED ROUTES - JWT
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware('auth:api')->group(function () {
+
+    // Auth
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // ===== Categories (anggota 1) =====
+
     Route::get('/categories', [CategoryController::class, 'index']);
-    Route::get('/categories/{id}', [CategoryController::class, 'show'])->whereNumber('id');
+
+    Route::get('/categories/{id}', [CategoryController::class, 'show'])
+        ->whereNumber('id');
+
     Route::post('/categories', [CategoryController::class, 'store']);
-    Route::match(['put', 'patch'], '/categories/{id}', [CategoryController::class, 'update'])->whereNumber('id');
 
-    // ===== Products (anggota 2): tempel blok di sini =====
-    // ===== Transactions (anggota 3): tempel blok di sini =====
-    // ===== Product Reviews (anggota 4): tempel blok di sini =====
+    Route::match(['put', 'patch'], '/categories/{id}',
+        [CategoryController::class, 'update'])
+        ->whereNumber('id');
 
-    // Hanya admin: Delete (berada di dalam auth:api, jadi 401 muncul lebih dulu)
+    // ===== Products (anggota 2) =====
+
+    Route::post('/products', [ProductController::class, 'store']);
+
+    Route::match(['put', 'patch'], '/products/{id}',
+        [ProductController::class, 'update'])
+        ->whereNumber('id');
+
+    // ===== Transactions (anggota 3) =====
+
+    // ===== Product Reviews (anggota 4) =====
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN ONLY - DELETE
+    |--------------------------------------------------------------------------
+    */
+
     Route::middleware('role:admin')->group(function () {
-        Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->whereNumber('id');
-        // Route::delete products / transactions / product_reviews di sini
+
+        // Delete Categories
+        Route::delete('/categories/{id}',
+            [CategoryController::class, 'destroy'])
+            ->whereNumber('id');
+
+        // Delete Products
+        Route::delete('/products/{id}',
+            [ProductController::class, 'destroy'])
+            ->whereNumber('id');
+
+        // Delete Transactions
+
+        // Delete Product Reviews
+
     });
+
 });
