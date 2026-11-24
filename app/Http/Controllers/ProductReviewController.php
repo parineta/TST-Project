@@ -39,7 +39,7 @@ class ProductReviewController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'product_id' => 'required|integer|min:1',
+            'product_id' => 'required|integer|exists:products,product_id',
             'rating' => 'required|integer|between:1,5',
             'comment' => 'nullable|string|max:1000',
         ]);
