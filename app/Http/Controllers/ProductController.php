@@ -31,7 +31,7 @@ class ProductController extends Controller
         ], 200);
     }
 
-    // POST - Menambahkan produk
+    // POST - User dan Admin
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -55,21 +55,10 @@ class ProductController extends Controller
         ], 201);
     }
 
-    // PUT/PATCH - Mengubah produk
+    // PUT/PATCH - User dan Admin
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        $user = $request->user();
-
-        // User hanya bisa mengubah produk miliknya
-        if (
-            $user->role !== 'admin' &&
-            (int) $product->user_id !== (int) $user->id
-        ) {
-            return response()->json([
-                'message' => 'Anda tidak memiliki akses mengubah produk ini'
-            ], 403);
-        }
 
         $validated = $request->validate([
             'nama_product' => 'sometimes|required|string|max:100',
@@ -91,7 +80,7 @@ class ProductController extends Controller
         ], 200);
     }
 
-    // DELETE - Hanya admin
+    // DELETE - Hanya Admin
     public function destroy(Request $request, $id)
     {
         if ($request->user()->role !== 'admin') {
@@ -101,6 +90,7 @@ class ProductController extends Controller
         }
 
         $product = Product::findOrFail($id);
+
         $product->delete();
 
         return response()->json([
