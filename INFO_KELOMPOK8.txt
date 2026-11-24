@@ -1,0 +1,218 @@
+INFORMASI PROJEK AKHIR STUDI KASUS TST
+REST API SISTEM MANAJEMEN RESTORAN
+
+==================================================
+1. IDENTITAS KELOMPOK
+==================================================
+
+Nomor Kelompok: 8 
+
+Anggota 1
+Nama: Parineta
+NIM: 255150600111037
+Tabel: categories
+
+Anggota 2
+Nama: Zainiatur Rizqiyah
+NIM: 255150601111024
+Tabel: products
+
+Anggota 3
+Nama: Lely Cristin Sitorus
+NIM: 255150600111024
+Tabel: transactions
+
+Anggota 4
+Nama: Ilfa Zakiyah Al-Abidah
+NIM: 255150601111021
+Tabel: product_reviews
+
+Tabel wajib kelompok: users
+
+==================================================
+2. INFORMASI DATABASE
+==================================================
+
+Nama Database: tst_project
+DBMS: MariaDB
+Framework: Laravel 13
+Autentikasi: JWT (JSON Web Token)
+Otorisasi: RBAC (Role-Based Access Control)
+
+==================================================
+3. KREDENSIAL AKUN TESTING
+==================================================
+
+ADMIN
+Email: admin@example.com
+Password: password
+Role: admin
+Hak Akses: CRUD (Create, Read, Update, Delete)
+
+USER
+Email: user@example.com
+Password: password
+Role: user
+Hak Akses: CRU (Create, Read, Update)
+
+Kedua akun dibuat secara otomatis melalui DatabaseSeeder.
+
+==================================================
+4. DAFTAR ENDPOINT REST API
+==================================================
+
+Base URL: http://127.0.0.1:8000
+
+A. AUTHENTICATION
+
+GET /api/ping
+Akses: Publik
+Fungsi: Memeriksa status API.
+
+POST /api/register
+Akses: Publik
+Fungsi: Mendaftarkan akun user.
+
+POST /api/login
+Akses: Publik
+Fungsi: Login dan memperoleh JWT token.
+
+GET /api/me
+Akses: User dan Admin
+Fungsi: Menampilkan profil pengguna.
+
+POST /api/logout
+Akses: User dan Admin
+Fungsi: Logout pengguna.
+
+B. CATEGORIES
+
+GET /api/categories
+Akses: User dan Admin
+Fungsi: Menampilkan semua kategori.
+
+GET /api/categories/{id}
+Akses: User dan Admin
+Fungsi: Menampilkan detail kategori.
+
+POST /api/categories
+Akses: User dan Admin
+Fungsi: Menambahkan kategori.
+
+PUT/PATCH /api/categories/{id}
+Akses: User dan Admin
+Fungsi: Memperbarui kategori.
+
+DELETE /api/categories/{id}
+Akses: Admin
+Fungsi: Menghapus kategori.
+
+C. PRODUCTS
+
+GET /api/products
+Akses: Publik (tanpa login)
+Fungsi: Menampilkan semua produk.
+
+GET /api/products/{id}
+Akses: User dan Admin
+Fungsi: Menampilkan detail produk.
+
+POST /api/products
+Akses: User dan Admin
+Fungsi: Menambahkan produk.
+
+PUT/PATCH /api/products/{id}
+Akses: User dan Admin
+Fungsi: Memperbarui produk.
+
+DELETE /api/products/{id}
+Akses: Admin
+Fungsi: Menghapus produk.
+
+D. TRANSACTIONS
+
+GET /api/transactions
+Akses: User dan Admin
+Fungsi: Menampilkan semua transaksi.
+
+GET /api/transactions/{id}
+Akses: User dan Admin
+Fungsi: Menampilkan detail transaksi.
+
+POST /api/transactions
+Akses: User dan Admin
+Fungsi: Menambahkan transaksi.
+
+PUT/PATCH /api/transactions/{id}
+Akses: User dan Admin
+Fungsi: Memperbarui transaksi.
+
+DELETE /api/transactions/{id}
+Akses: Admin
+Fungsi: Menghapus transaksi.
+
+E. PRODUCT REVIEWS
+
+GET /api/product-reviews
+Akses: User dan Admin
+Fungsi: Menampilkan semua ulasan produk.
+
+GET /api/product-reviews/{id}
+Akses: User dan Admin
+Fungsi: Menampilkan detail ulasan produk.
+
+POST /api/product-reviews
+Akses: User dan Admin
+Fungsi: Menambahkan ulasan produk.
+
+PUT/PATCH /api/product-reviews/{id}
+Akses: User (ulasan milik sendiri) dan Admin (seluruh ulasan).
+Fungsi: Memperbarui ulasan produk.
+
+DELETE /api/product-reviews/{id}
+Akses: Admin
+Fungsi: Menghapus ulasan produk.
+
+Total: 25 route API.
+
+==================================================
+5. FITUR KEAMANAN API
+==================================================
+
+- Autentikasi menggunakan JWT.
+- Otorisasi menggunakan RBAC.
+- Role user memiliki akses CRU.
+- Role admin memiliki akses CRUD.
+- Operasi DELETE dibatasi khusus admin.
+- Ownership pada Product Reviews: user hanya dapat memperbarui ulasan miliknya sendiri berdasarkan user_id, sedangkan admin dapat memperbarui seluruh ulasan.
+- Validasi input menggunakan Laravel Validator.
+- Validasi rating ulasan antara 1–5.
+- Validasi keberadaan produk sebelum membuat ulasan.
+- Relasi tabel Product Reviews dengan Users dan Products menggunakan foreign key.
+
+==================================================
+6. PANDUAN INSTALASI DAN PENGUJIAN
+==================================================
+
+1. Ekstrak file ZIP.
+2. Buka folder projek menggunakan terminal.
+3. Jalankan composer install.
+4. Buat database MariaDB bernama tst_project.
+5. Sesuaikan konfigurasi database pada file .env.
+6. Jalankan php artisan key:generate.
+7. Jalankan php artisan jwt:secret.
+8. Jalankan php artisan migrate --seed.
+9. Jalankan php artisan serve.
+10. Buka Postman.
+11. Login menggunakan akun testing.
+12. Salin access_token hasil login.
+13. Gunakan Authorization dengan tipe Bearer Token untuk mengakses endpoint yang membutuhkan autentikasi.
+14. Gunakan header Accept: application/json dan Content-Type: application/json untuk request JSON.
+
+==================================================
+7. REPOSITORY GITHUB
+==================================================
+
+https://github.com/parineta/TST-Project
+
+==================================================
