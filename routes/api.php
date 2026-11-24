@@ -1,44 +1,99 @@
+
 <?php
-use App\Http\Controllers\TransactionController;
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductReviewController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
-// Terbuka
-Route::get('/ping', fn () => ['message' => 'API Laravel berjalan']);
+// ===== ROUTE PUBLIK =====
+Route::get('/ping', fn () => [
+    'message' => 'API Laravel berjalan'
+]);
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Harus login (user & admin): Create, Read, Update
+// ===== ROUTE USER & ADMIN (JWT) =====
 Route::middleware('auth:api')->group(function () {
+
+    // Authentication
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // ===== Categories (anggota 1) =====
+    // ===== CATEGORIES (PARI) =====
     Route::get('/categories', [CategoryController::class, 'index']);
-    Route::get('/categories/{id}', [CategoryController::class, 'show'])->whereNumber('id');
-    Route::post('/categories', [CategoryController::class, 'store']);
-    Route::match(['put', 'patch'], '/categories/{id}', [CategoryController::class, 'update'])->whereNumber('id');
-
-    // ===== Products (anggota 2): tempel blok di sini =====
-    // ===== Transactions (anggota 3): tempel blok di sini =====
-Route::get('/transactions', [TransactionController::class, 'index']);
-
-Route::get('/transactions/{id}', [TransactionController::class, 'show'])
-    ->whereNumber('id');
-Route::post('/transactions', [TransactionController::class, 'store']);
-Route::match(['put', 'patch'], '/transactions/{id}', [TransactionController::class, 'update'])
-    ->whereNumber('id');
-
-    // ===== Product Reviews (anggota 4): tempel blok di sini =====
-
-    // Hanya admin: Delete (berada di dalam auth:api, jadi 401 muncul lebih dulu)
-    Route::middleware('role:admin')->group(function () {
-        Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->whereNumber('id');
-        // Route::delete products  
-        // Route::delete transactions 
-    Route::delete('/transactions/{id}', [TransactionController::class, 'destroy'])
+    Route::get('/categories/{id}', [CategoryController::class, 'show'])
         ->whereNumber('id');
-        // Route::delete product_reviews di sini
+
+    Route::post('/categories', [CategoryController::class, 'store']);
+
+    Route::match(['put', 'patch'], '/categories/{id}', [
+        CategoryController::class, 'update'
+    ])->whereNumber('id');
+
+
+    // ===== PRODUCTS (ZAI) =====
+    // Route Products ditambahkan setelah fitur selesai.
+
+
+    // ===== TRANSACTIONS (LELY) =====
+    Route::get('/transactions', [TransactionController::class, 'index']);
+
+    Route::get('/transactions/{id}', [TransactionController::class, 'show'])
+        ->whereNumber('id');
+
+    Route::post('/transactions', [TransactionController::class, 'store']);
+
+    Route::match(['put', 'patch'], '/transactions/{id}', [
+        TransactionController::class, 'update'
+    ])->whereNumber('id');
+
+
+    // ===== PRODUCT REVIEWS (KAMU) =====
+
+    // GET semua review
+    Route::get('/product-reviews', [
+        ProductReviewController::class, 'index'
+    ]);
+
+    // GET detail review
+    Route::get('/product-reviews/{id}', [
+        ProductReviewController::class, 'show'
+    ])->whereNumber('id');
+
+    // POST tambah review
+    Route::post('/product-reviews', [
+        ProductReviewController::class, 'store'
+    ]);
+
+    // PUT/PATCH update review
+    Route::match(['put', 'patch'], '/product-reviews/{id}', [
+        ProductReviewController::class, 'update'
+    ])->whereNumber('id');
+
+
+    // ===== KHUSUS ADMIN (DELETE) =====
+    Route::middleware('role:admin')->group(function () {
+
+        // Delete Categories
+        Route::delete('/categories/{id}', [
+            CategoryController::class, 'destroy'
+        ])->whereNumber('id');
+
+        // Delete Products
+        // Ditambahkan setelah fitur Products selesai.
+
+        // Delete Transactions
+        Route::delete('/transactions/{id}', [
+            TransactionController::class, 'destroy'
+        ])->whereNumber('id');
+
+        // Delete Product Reviews
+        Route::delete('/product-reviews/{id}', [
+            ProductReviewController::class, 'destroy'
+        ])->whereNumber('id');
+
     });
 });
