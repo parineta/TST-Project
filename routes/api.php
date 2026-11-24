@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,8 +19,9 @@ Route::get('/ping', fn () => [
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Product - Public
+// Products - Public
 Route::get('/products', [ProductController::class, 'index']);
+
 Route::get('/products/{id}', [ProductController::class, 'show'])
     ->whereNumber('id');
 
@@ -31,7 +33,8 @@ Route::get('/products/{id}', [ProductController::class, 'show'])
 
 Route::middleware('auth:api')->group(function () {
 
-    // Auth
+    // ===== Auth =====
+
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -58,7 +61,20 @@ Route::middleware('auth:api')->group(function () {
 
     // ===== Transactions (anggota 3) =====
 
+    Route::get('/transactions', [TransactionController::class, 'index']);
+
+    Route::get('/transactions/{id}', [TransactionController::class, 'show'])
+        ->whereNumber('id');
+
+    Route::post('/transactions', [TransactionController::class, 'store']);
+
+    Route::match(['put', 'patch'], '/transactions/{id}',
+        [TransactionController::class, 'update'])
+        ->whereNumber('id');
+
     // ===== Product Reviews (anggota 4) =====
+
+    // Tambahkan route Product Reviews di sini.
 
     /*
     |--------------------------------------------------------------------------
@@ -79,6 +95,9 @@ Route::middleware('auth:api')->group(function () {
             ->whereNumber('id');
 
         // Delete Transactions
+        Route::delete('/transactions/{id}',
+            [TransactionController::class, 'destroy'])
+            ->whereNumber('id');
 
         // Delete Product Reviews
 
