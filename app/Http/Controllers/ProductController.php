@@ -60,16 +60,21 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
+        $rule = $request->isMethod('PUT')
+            ? 'required'
+            : 'sometimes|required';
+
         $validated = $request->validate([
-            'nama_product' => 'sometimes|required|string|max:100',
+            'nama_product' => "$rule|string|max:100",
             'kategori' => [
-                'sometimes',
-                'required',
+                $rule,
                 Rule::in(['Makanan', 'Minuman', 'Dessert'])
             ],
-            'harga' => 'sometimes|required|integer|min:0',
-            'deskripsi' => 'sometimes|nullable|string',
-            'stok' => 'sometimes|required|integer|min:0'
+            'harga' => "$rule|integer|min:0",
+            'deskripsi' => $request->isMethod('PUT')
+                ? 'present|nullable|string'
+                : 'sometimes|nullable|string',
+            'stok' => "$rule|integer|min:0"
         ]);
 
         $product->update($validated);
